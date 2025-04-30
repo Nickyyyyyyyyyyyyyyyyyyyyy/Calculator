@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Калькулятор Науковий - Все в одному</title>
+    <title>Калькулятор з Голосовим Вводом - Виправлено</title>
     <style>
         /* CSS стилі починаються тут */
         * {
@@ -18,29 +18,31 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background-color: #e9e9e9; /* Трохи світліший фон */
+            background-color: #e9e9e9;
         }
 
         .calculator {
-            background-color: #dcdcdc; /* Фон калькулятора */
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            background-color: #dcdcdc;
+            border-radius: 15px; /* Заокруглення для калькулятора */
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
             overflow: hidden;
             width: 95%;
-            max-width: 450px; /* Збільшимо максимальну ширину */
+            max-width: 480px; /* Трохи ширший для нових кнопок */
             border: 1px solid #bbb;
         }
 
         .display-container {
-             background-color: #f0f0f0; /* Фон дисплея */
+             background-color: #f0f0f0;
              color: #222;
              padding: 10px 15px;
              border-bottom: 1px solid #bbb;
-             min-height: 100px; /* Збільшимо висоту */
+             min-height: 100px;
              display: flex;
              flex-direction: column;
              justify-content: space-between;
-             position: relative; /* Для позиціонування індикаторів */
+             position: relative;
+             border-top-left-radius: 15px; /* Заокруглення */
+             border-top-right-radius: 15px;
         }
 
         .display-indicators {
@@ -49,52 +51,58 @@
             left: 15px;
             font-size: 0.8em;
             color: #555;
+            display: flex;
+            gap: 10px;
         }
-        #memory-indicator, #angle-indicator {
-             margin-right: 10px;
+        #memory-indicator, #angle-indicator, #voice-status {
              font-weight: bold;
-             display: inline-block; /* Щоб не зливалися */
-             min-width: 15px; /* Резервуємо місце */
+             min-width: 15px;
              text-align: center;
         }
+        #voice-status {
+            color: #007bff;
+        }
 
 
-        .previous-operand { /* Тепер показує попередній результат/помилку */
+        .previous-operand {
             color: #555;
             font-size: 0.9em;
             min-height: 20px;
             text-align: right;
         }
 
-        .current-operand { /* Тепер показує поточний вираз */
+        .current-operand {
             color: #111;
-            font-size: 1.8em; /* Зменшимо трохи для довших виразів */
+            font-size: 1.8em;
             font-weight: 500;
             min-height: 50px;
             text-align: right;
             word-wrap: break-word;
             word-break: break-all;
-            overflow-y: auto; /* Додамо скрол, якщо вираз дуже довгий */
-            max-height: 70px; /* Обмеження висоти, щоб скрол з'являвся */
+            overflow-y: auto;
+            max-height: 70px;
         }
 
 
         .buttons {
             display: grid;
             grid-template-columns: repeat(5, 1fr); /* 5 стовпців */
-            gap: 1px;
-            background-color: #bbb; /* Колір проміжків */
+            gap: 2px;
+            background-color: #ccc;
+            padding: 5px;
         }
 
         button {
-            background-color: #f8f8f8; /* Світлі кнопки */
+            background-color: #f8f8f8;
             border: none;
-            padding: 15px 0; /* Зменшимо падінг */
-            font-size: 1.1em; /* Зменшимо шрифт */
+            padding: 15px 0;
+            font-size: 1.1em;
             cursor: pointer;
-            transition: background-color 0.15s ease;
+            transition: background-color 0.15s ease, transform 0.1s ease;
             color: #333;
             text-align: center;
+            border-radius: 8px; /* ЗАОКРУГЛЕНІ КНОПКИ */
+            box-shadow: 0 2px 3px rgba(0,0,0,0.1);
         }
         button:hover {
             background-color: #eee;
@@ -102,81 +110,54 @@
         button:active {
             background-color: #ddd;
             box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+            transform: scale(0.98);
         }
 
         /* Стилі для різних типів кнопок */
-        button[data-action="number"] {
-            background-color: #fff;
-            font-weight: 500;
-        }
-        button[data-action="number"]:hover { background-color: #f5f5f5; }
-        button[data-action="number"]:active { background-color: #eee; }
+         button[data-action="number"] { background-color: #fff; font-weight: 500; }
+         button[data-action="number"]:hover { background-color: #f5f5f5; }
+         button[data-action="number"]:active { background-color: #eee; }
 
-        button.operator,
-        button[data-action="parenthesis"],
-        button[data-action="power"] {
-            background-color: #f0f0f0;
-            color: #444;
-        }
-        button.operator:hover,
-        button[data-action="parenthesis"]:hover,
-        button[data-action="power"]:hover { background-color: #e8e8e8; }
-        button.operator:active,
-        button[data-action="parenthesis"]:active,
-        button[data-action="power"]:active { background-color: #ddd; }
+         button.operator, button[data-action="parenthesis"], button[data-action="power"] { background-color: #f0f0f0; color: #444; }
+         button.operator:hover, button[data-action="parenthesis"]:hover, button[data-action="power"]:hover { background-color: #e8e8e8; }
+         button.operator:active, button[data-action="parenthesis"]:active, button[data-action="power"]:active { background-color: #ddd; }
 
-        button.function,
-        button[data-action="trig"],
-        button[data-action="log"],
-        button[data-action="factorial"],
-        button[data-action="constant"],
-        button[data-action="memory"],
-        button[data-action="clear"],
-        button[data-action="negate"],
-        button[data-action="delete"] {
-            background-color: #e8e8e8; /* Ще трохи темніші для функцій */
-            color: #333;
-        }
-        button.function:hover, /* ... і так далі для :hover та :active */
-        button[data-action="trig"]:hover,
-        button[data-action="log"]:hover,
-        button[data-action="factorial"]:hover,
-        button[data-action="constant"]:hover,
-        button[data-action="memory"]:hover,
-        button[data-action="clear"]:hover,
-        button[data-action="negate"]:hover,
-        button[data-action="delete"]:hover {
+         button.function, button[data-action="trig"], button[data-action="log"], button[data-action="factorial"], button[data-action="constant"], button[data-action="memory"], button[data-action="clear"], button[data-action="negate"], button[data-action="delete"], button#voice-input-btn {
+            background-color: #e8e8e8; color: #333;
+         }
+         button.function:hover, button[data-action="trig"]:hover, button[data-action="log"]:hover, button[data-action="factorial"]:hover, button[data-action="constant"]:hover, button[data-action="memory"]:hover, button[data-action="clear"]:hover, button[data-action="negate"]:hover, button[data-action="delete"]:hover, button#voice-input-btn:hover {
              background-color: #ddd;
          }
-        button.function:active, /* ... */
-        button[data-action="trig"]:active,
-        button[data-action="log"]:active,
-        button[data-action="factorial"]:active,
-        button[data-action="constant"]:active,
-        button[data-action="memory"]:active,
-        button[data-action="clear"]:active,
-        button[data-action="negate"]:active,
-        button[data-action="delete"]:active {
+         button.function:active, button[data-action="trig"]:active, button[data-action="log"]:active, button[data-action="factorial"]:active, button[data-action="constant"]:active, button[data-action="memory"]:active, button[data-action="clear"]:active, button[data-action="negate"]:active, button[data-action="delete"]:active, button#voice-input-btn:active {
              background-color: #ccc;
-        }
-
+         }
 
         button.equals {
-            background-color: #add8e6; /* Світло-блакитний */
-            color: #191970; /* Темно-синій */
-            font-weight: bold;
-            grid-column: span 2; /* Розтягнути на 2 стовпці */
+            background-color: #add8e6; color: #191970; font-weight: bold;
+            grid-column: span 2;
         }
         button.equals:hover { background-color: #9acced; }
         button.equals:active { background-color: #87ceeb; }
 
-        button[data-value="RAD"].active-mode { /* Стиль для активного режиму кутів */
-             background-color: #b0e0e6; /* Пудрово-синій */
-             box-shadow: inset 0 0 3px rgba(0,0,0,0.2);
+        button[data-value="RAD"].active-mode {
+             background-color: #b0e0e6; box-shadow: inset 0 0 3px rgba(0,0,0,0.2);
         }
 
+        #voice-input-btn {
+            font-size: 1.3em;
+            background-color: #d4edda;
+        }
+        #voice-input-btn.listening {
+             background-color: #f8d7da;
+             animation: pulse 1.5s infinite;
+        }
 
-        /* Адаптивність */
+         @keyframes pulse {
+             0% { box-shadow: 0 0 0 0 rgba(248, 215, 218, 0.7); }
+             70% { box-shadow: 0 0 0 10px rgba(248, 215, 218, 0); }
+             100% { box-shadow: 0 0 0 0 rgba(248, 215, 218, 0); }
+         }
+
         @media (max-width: 400px) {
             .current-operand { font-size: 1.6em; }
             button { font-size: 1em; padding: 12px 0;}
@@ -191,6 +172,7 @@
              <div class="display-indicators">
                  <span id="memory-indicator"></span>
                  <span id="angle-indicator">RAD</span>
+                 <span id="voice-status"></span>
              </div>
             <div id="previous-operand" class="previous-operand"></div>
             <div id="current-operand" class="current-operand">0</div>
@@ -201,564 +183,605 @@
             <button data-action="memory" data-value="MS">MS</button>
             <button data-action="memory" data-value="M+">M+</button>
             <button data-action="memory" data-value="M-">M-</button>
-
-            <button data-action="angle-mode" data-value="RAD" class="active-mode">RAD</button> <button data-action="trig" data-value="sin(">sin</button>
+            <button data-action="angle-mode" data-value="RAD" class="active-mode">RAD</button>
+            <button data-action="trig" data-value="sin(">sin</button>
             <button data-action="trig" data-value="cos(">cos</button>
             <button data-action="trig" data-value="tan(">tan</button>
             <button data-action="delete" data-value="DEL">DEL</button>
-
             <button data-action="power" data-value="**">xʸ</button>
             <button data-action="log" data-value="log10(">log</button>
             <button data-action="log" data-value="log(">ln</button>
             <button data-action="parenthesis" data-value="(">(</button>
             <button data-action="parenthesis" data-value=")">)</button>
-
             <button data-action="function" data-value="sqrt(">√x</button>
             <button data-action="number" data-value="7">7</button>
             <button data-action="number" data-value="8">8</button>
             <button data-action="number" data-value="9">9</button>
             <button data-action="operator" data-value="/" class="operator">&divide;</button>
-
             <button data-action="factorial" data-value="factorial(">n!</button>
             <button data-action="number" data-value="4">4</button>
             <button data-action="number" data-value="5">5</button>
             <button data-action="number" data-value="6">6</button>
             <button data-action="operator" data-value="*" class="operator">&times;</button>
-
             <button data-action="constant" data-value="PI">π</button>
             <button data-action="number" data-value="1">1</button>
             <button data-action="number" data-value="2">2</button>
             <button data-action="number" data-value="3">3</button>
             <button data-action="operator" data-value="-" class="operator">-</button>
-
-             <button data-action="constant" data-value="E">e</button>
+            <button data-action="constant" data-value="E">e</button>
             <button data-action="negate" data-value="+/-">+/-</button>
             <button data-action="number" data-value="0">0</button>
             <button data-action="decimal" data-value=".">.</button>
             <button data-action="operator" data-value="+" class="operator">+</button>
-
-             <button data-action="clear" data-value="AC">AC</button>
-             <button data-action="clear" data-value="CE">CE</button> <button data-action="equals" class="equals" data-value="=">=</button> </div>
+            <button data-action="clear" data-value="AC">AC</button>
+            <button data-action="clear" data-value="CE">CE</button>
+            <button id="voice-input-btn">🎤</button>
+            <button data-action="equals" class="equals" data-value="=">=</button>
+        </div>
     </div>
 
     <script>
-        // JavaScript код починається тут
+        // Додаємо обгортку DOMContentLoaded для надійності
+        document.addEventListener('DOMContentLoaded', () => {
 
-        // Додаємо функцію факторіалу глобально для new Function()
-        window.factorial = function(n) {
-            if (n < 0) return NaN;
-            if (n > 170) return Infinity; // Обмеження для JS
-            if (n === 0 || n === 1) return 1;
-            let result = 1;
-            for (let i = 2; i <= n; i++) {
-                result *= i;
-            }
-            return result;
-        }
-
-        class ScientificCalculator {
-            constructor(previousOperandTextElement, currentOperandTextElement, memoryIndicator, angleIndicator) {
-                this.previousOperandTextElement = previousOperandTextElement;
-                this.currentOperandTextElement = currentOperandTextElement;
-                this.memoryIndicator = memoryIndicator;
-                this.angleIndicator = angleIndicator; // Поки не використовується для обчислень
-                this.isRadians = true; // За замовчуванням радіани
-                this.memoryValue = 0;
-                this.clearAll();
-                this.updateDisplay();
+            // --- Функція факторіалу ---
+            window.factorial = function(n) {
+                // ... (код без змін) ...
+                if (n < 0) return NaN;
+                if (n > 170) return Infinity;
+                if (n === 0 || n === 1) return 1;
+                let result = 1;
+                for (let i = 2; i <= n; i++) { result *= i; }
+                return result;
             }
 
-            // --- Стан та Очищення ---
-            clearAll() {
-                this.currentExpression = '0'; // Основний рядок, що редагується
-                this.previousResult = '';     // Останній обчислений результат
-                this.isResultDisplayed = true; // Чи показується результат, чи вводиться вираз
-                this.openParentheses = 0;    // Лічильник відкритих дужок
-                // Не скидаємо пам'ять та режим кутів при AC
-                this.updateDisplay();
-            }
+            // --- Клас Калькулятора ---
+            class ScientificCalculator {
+                constructor(previousOperandTextElement, currentOperandTextElement, memoryIndicator, angleIndicator, voiceStatusIndicator) {
+                    this.previousOperandTextElement = previousOperandTextElement;
+                    this.currentOperandTextElement = currentOperandTextElement;
+                    this.memoryIndicator = memoryIndicator;
+                    this.angleIndicator = angleIndicator;
+                    this.voiceStatusIndicator = voiceStatusIndicator;
+                    this.isRadians = true;
+                    this.memoryValue = 0;
+                    this.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                    this.recognition = this.SpeechRecognition ? new this.SpeechRecognition() : null;
+                    this.isListening = false;
 
-            clearEntry() {
-                // Скидає поточний ввід до 0, але зберігає попередні частини виразу
-                // Це складно реалізувати правильно з рядком виразу, тому поки що CE=AC
-                 this.clearAll(); // Спрощена реалізація CE
-            }
-
-            // --- Ввід Даних ---
-            appendNumber(number) {
-                 if (this.isResultDisplayed) {
-                     this.currentExpression = number;
-                     this.isResultDisplayed = false;
-                 } else {
-                    // Заборона кількох нулів на початку числа
-                     if (number === '0' && this.currentExpression.match(/(^|[\s(*+/-^])0$/)) return;
-                     // Якщо останній символ - закриваюча дужка або константа, додаємо "*"
-                     if (this.currentExpression.match(/[)eπ]$/i)) {
-                          this.currentExpression += '*';
-                     }
-                     this.currentExpression += number;
-                 }
-            }
-
-            appendDecimal() {
-                if (this.isResultDisplayed) {
-                    this.currentExpression = '0.';
-                    this.isResultDisplayed = false;
-                    return;
+                    this.clearAll(); // Очищення при старті
+                    // this.updateDisplay(); // updateDisplay викличеться з clearAll
+                    this.setupVoiceRecognition();
                 }
-                 // Знаходимо останнє число у виразі
-                 const match = this.currentExpression.match(/[\d.]+$/);
-                 // Дозволяємо крапку, тільки якщо її ще немає в останньому числі
-                 if (match && match[0].includes('.')) return;
 
-                 // Якщо останній символ не цифра, додаємо "0." (напр. після оператора)
-                 if (!this.currentExpression.match(/[\d]$/)) {
-                     // Якщо останнє - константа або ) додаємо *
-                     if (this.currentExpression.match(/[eπ)]$/i)) {
-                         this.currentExpression += '*0.';
-                     } else {
-                         this.currentExpression += '0.';
-                     }
-                 } else {
-                     this.currentExpression += '.';
-                 }
-            }
-
-            appendOperator(operator) {
-                if (this.currentExpression.toString().startsWith('Error:')) return;
-                 this.isResultDisplayed = false;
-                 // Заміна останнього оператора, якщо вони несумісні (напр., +-)
-                 // Додаємо пробіли для кращої читабельності (хоча для new Function не обов'язково)
-                 if (this.currentExpression.match(/[+\-*/^]\s$/)) {
-                     this.currentExpression = this.currentExpression.slice(0, -2) + operator + ' ';
-                 } else if (this.currentExpression !== '' && this.currentExpression !== '0' && this.currentExpression !== '-') {
-                     this.currentExpression += ' ' + operator + ' ';
-                 } else if (operator === '-' && (this.currentExpression === '0' || this.currentExpression === '')) {
-                      // Дозволяємо почати з унарного мінуса
-                      this.currentExpression = '-';
-                 }
-            }
-
-             appendPowerOperator() {
-                 if (this.currentExpression.toString().startsWith('Error:') || this.currentExpression.match(/[+\-*/(]\s?$/) || this.currentExpression === '' || this.currentExpression === '0') return; // Не ставити степінь після оператора або на початку
-                 this.isResultDisplayed = false;
-                 this.currentExpression += '**'; // Використовуємо ** для степеня в JS
-             }
-
-            appendParenthesis(paren) {
-                if (this.isResultDisplayed && paren === '(') {
-                     this.currentExpression = '(';
-                     this.isResultDisplayed = false;
-                     this.openParentheses++;
-                     return;
-                }
-                 this.isResultDisplayed = false;
-
-                 if (paren === '(') {
-                     // Якщо останній символ - цифра, константа або ), додаємо множення
-                     if (this.currentExpression.match(/[\d.)eπ]$/i)) {
-                         this.currentExpression += '*(';
-                     } else {
-                         this.currentExpression += '(';
-                     }
-                     this.openParentheses++;
-                 } else if (paren === ')') {
-                     // Додаємо дужку, тільки якщо є відкриті і останній символ дозволяє
-                     if (this.openParentheses > 0 && !this.currentExpression.match(/[+\-*/(.\s]$/)) {
-                         this.currentExpression += ')';
-                         this.openParentheses--;
-                     }
-                 }
-            }
-
-            appendFunction(func) { // 'sin(', 'log(', 'sqrt(', 'factorial('
-                 if (this.isResultDisplayed) {
-                     this.currentExpression = func;
-                     this.isResultDisplayed = false;
-                 } else {
-                    // Якщо останній символ - цифра, константа або ), додаємо множення
-                     if (this.currentExpression.match(/[\d.)eπ]$/i)) {
-                         this.currentExpression += '*' + func;
-                     } else {
-                         this.currentExpression += func;
-                     }
-                 }
-                 if (!func.startsWith('factorial')) { // Факторіал не додає дужку для лічильника
-                     this.openParentheses++;
-                 }
-            }
-
-            appendConstant(constSymbol) { // 'PI', 'E'
-                 const constValue = constSymbol === 'PI' ? 'π' : 'e';
-                 if (this.isResultDisplayed) {
-                     this.currentExpression = constValue;
-                     this.isResultDisplayed = false;
-                 } else {
-                    // Якщо останній символ - цифра, константа або ), додаємо множення
-                     if (this.currentExpression.match(/[\d.)eπ]$/i)) {
-                         this.currentExpression += '*' + constValue;
-                     } else {
-                         this.currentExpression += constValue;
-                     }
-                 }
-            }
-
-
-            // --- Видалення ---
-            deleteLast() {
-                 if (this.isResultDisplayed) return; // Не видаляти результат
-                 if (this.currentExpression === '0' || this.currentExpression === '') {
-                     this.currentExpression = '0';
-                     return;
-                 }
-
-                 let deleted = false;
-                 // Спробувати видалити функції типу sin(, log(, sqrt(, fact(
-                 const funcMatch = this.currentExpression.match(/(sin|cos|tan|log10|log|sqrt|factorial)\($/i);
-                 if (funcMatch) {
-                     this.currentExpression = this.currentExpression.slice(0, -funcMatch[0].length);
-                     if (!funcMatch[0].startsWith('factorial')) { // Не зменшувати для факторіалу
-                         this.openParentheses--;
-                     }
-                     deleted = true;
-                 }
-
-                 // Спробувати видалити оператор з пробілами або степінь
-                 if (!deleted && this.currentExpression.match(/(\s[+\-*/]\s|\*\*)$/)) {
-                     this.currentExpression = this.currentExpression.replace(/(\s[+\-*/]\s|\*\*)$/, '');
-                     deleted = true;
-                 }
-
-                 // Видалити константу або дужку
-                  if (!deleted && this.currentExpression.match(/[()πe]$/i)) {
-                     const lastChar = this.currentExpression.slice(-1);
-                      this.currentExpression = this.currentExpression.slice(0, -1);
-                      if (lastChar === '(') this.openParentheses--;
-                      else if (lastChar === ')') this.openParentheses++; // Збільшуємо, бо видалили закриваючу
-                      deleted = true;
-                  }
-
-                 // Видалити звичайний символ (цифру, крапку)
-                 if (!deleted) {
-                    const lastChar = this.currentExpression.slice(-1);
-                    if (lastChar === '(') this.openParentheses--; // На випадок, якщо вище не спрацювало
-                    else if (lastChar === ')') this.openParentheses++;
-                    this.currentExpression = this.currentExpression.slice(0, -1);
-                 }
-
-                  // Якщо після видалення рядок порожній, ставимо "0"
-                  if (this.currentExpression === '' || this.currentExpression === '-') {
-                      this.currentExpression = '0';
-                  }
-                 this.updateDisplay(); // Оновлюємо одразу
-            }
-
-
-            // --- Інші Функції ---
-            negate() {
-                // TODO: Реалізувати коректну зміну знаку останнього числа у виразі
-                // Це складно зробити надійно з рядком, тому поки що не реалізовано
-                console.warn("Negate function needs proper implementation for expression strings.");
-            }
-
-            toggleAngleMode() {
-                // Поки не впливає на обчислення, тільки на індикатор
-                this.isRadians = !this.isRadians;
-                this.updateDisplay();
-            }
-
-            // --- Пам'ять ---
-            handleMemory(operation) {
-                let currentValue = NaN;
-                 // Спробуємо отримати поточне число або результат обчислення
-                 if (this.isResultDisplayed && this.previousResult !== '' && !this.previousResult.startsWith('Error')) {
-                     currentValue = parseFloat(this.previousResult);
-                 } else {
-                     try {
-                         // Спроба обчислити поточний вираз для MS, M+, M-
-                         const result = this.evaluateExpression(this.currentExpression);
-                         currentValue = result;
-                     } catch {
-                         currentValue = NaN; // Не вдалося обчислити
-                     }
-                 }
-
-
-                 switch(operation) {
-                     case 'MC': // Memory Clear
-                         this.memoryValue = 0;
-                         break;
-                     case 'MR': // Memory Recall
-                          if (this.isResultDisplayed) {
-                              this.currentExpression = this.memoryValue.toString();
-                              this.isResultDisplayed = false;
-                          } else {
-                              // Якщо останнє число/константа/дужка - додаємо множення
-                              if (this.currentExpression.match(/[\d.)eπ]$/i)) {
-                                  this.currentExpression += '*' + this.memoryValue.toString();
-                              } else {
-                                  this.currentExpression += this.memoryValue.toString();
-                              }
-                          }
-                          break;
-                     case 'MS': // Memory Store
-                         if (!isNaN(currentValue)) {
-                             this.memoryValue = currentValue;
-                         } else {
-                              this.previousOperandTextElement.innerText = "Cannot store non-numeric value";
-                         }
-                         break;
-                     case 'M+': // Memory Add
-                         if (!isNaN(currentValue)) {
-                             this.memoryValue += currentValue;
-                         } else {
-                              this.previousOperandTextElement.innerText = "Cannot add non-numeric value";
-                         }
-                         break;
-                     case 'M-': // Memory Subtract
-                         if (!isNaN(currentValue)) {
-                             this.memoryValue -= currentValue;
-                         } else {
-                               this.previousOperandTextElement.innerText = "Cannot subtract non-numeric value";
-                         }
-                         break;
-                 }
-                 this.updateDisplay();
-            }
-
-             // --- Обчислення ---
-             evaluateExpression(expression) {
-                 // 1. Перевірка та закриття дужок
-                 let evalExpression = expression.trim();
-                 if (this.openParentheses > 0) {
-                     evalExpression += ')'.repeat(this.openParentheses);
-                 }
-                 this.openParentheses = 0; // Скидаємо лічильник після спроби закрити
-
-                 // 2. Заміна символів на JS еквіваленти
-                 evalExpression = evalExpression
-                     .replace(/π/g, 'Math.PI')
-                     .replace(/e/g, 'Math.E')
-                     .replace(/log10\(/g, 'Math.log10(')
-                     .replace(/log\(/g, 'Math.log(')    // ln -> Math.log
-                     .replace(/sqrt\(/g, 'Math.sqrt(')
-                     .replace(/sin\(/g, 'Math.sin(')    // Поки тільки радіани
-                     .replace(/cos\(/g, 'Math.cos(')
-                     .replace(/tan\(/g, 'Math.tan(')
-                     .replace(/factorial\(/g, 'window.factorial(') // Використовуємо глобальну функцію
-                     .replace(/\^/g, '**') // Залишаємо, хоча зараз використовуємо **
-                     .replace(/\s/g, ''); // Видаляємо пробіли перед обчисленням
-
-                 // 3. Обчислення за допомогою new Function (НЕБЕЗПЕЧНО!)
-                 // ** ПОПЕРЕДЖЕННЯ: Цей метод небезпечний для реальних застосунків! **
-                 const calculate = new Function('return ' + evalExpression);
-                 let result = calculate();
-
-                 // 4. Перевірка результату
-                 if (!isFinite(result)) {
-                     if (isNaN(result)) throw new Error("Невірний вираз");
-                     else throw new Error("Ділення на нуль або переповнення");
-                 }
-                 // Обмеження точності
-                 return parseFloat(result.toPrecision(15)); // Використовуємо toPrecision
-             }
-
-
-            compute() {
-                if (this.currentExpression.toString().startsWith('Error:')) return;
-                try {
-                    const result = this.evaluateExpression(this.currentExpression);
-                    this.previousResult = result.toString(); // Зберігаємо результат
-                    this.currentExpression = this.previousResult; // Показуємо результат
-                    this.isResultDisplayed = true; // Позначаємо, що це результат
-                    this.previousOperandTextElement.innerText = ''; // Очищаємо верхній рядок
-                } catch (error) {
-                    this.previousResult = `Error: ${error.message}`;
-                    this.currentExpression = '0'; // Скидаємо вираз при помилці
+                // --- Стан та Очищення ---
+                clearAll() {
+                    this.currentExpression = '0';
+                    this.previousResult = '';
                     this.isResultDisplayed = true;
-                    this.previousOperandTextElement.innerText = this.previousResult; // Показуємо помилку зверху
+                    this.openParentheses = 0;
+                    console.log('clearAll called'); // Лог для перевірки
+                    this.updateDisplay();
                 }
-                 this.openParentheses = 0; // Скидаємо дужки після обчислення/помилки
-            }
+                clearEntry() { this.clearAll(); } // Спрощено
 
-            // --- Оновлення Дисплея ---
-            updateDisplay() {
-                 // Оновлення індикаторів
-                 this.memoryIndicator.innerText = this.memoryValue !== 0 ? 'M' : '';
-                 this.angleIndicator.innerText = this.isRadians ? 'RAD' : 'DEG';
-                 // Виділення активної кнопки режиму кутів
-                 document.querySelectorAll('button[data-action="angle-mode"]').forEach(btn => {
-                      btn.classList.remove('active-mode');
-                      if ((this.isRadians && btn.dataset.value === 'RAD') || (!this.isRadians && btn.dataset.value === 'DEG')) {
-                           btn.classList.add('active-mode');
-                      }
-                 });
-
-
-                 // Форматування основного дисплея
-                 if (this.isResultDisplayed && this.previousResult.toString().startsWith('Error:')) {
-                     // Якщо остання дія була помилкою, показуємо її зверху, а знизу 0
-                     this.previousOperandTextElement.innerText = this.previousResult;
-                     this.currentOperandTextElement.innerText = '0';
-                 } else if (this.isResultDisplayed) {
-                      // Показуємо результат
-                      this.currentOperandTextElement.innerText = this.formatNumber(this.currentExpression);
-                      this.previousOperandTextElement.innerText = ''; // Очищаємо верхній рядок
+                // --- Ввід Даних ---
+                appendNumber(number) {
+                     console.log(`appendNumber: ${number}`); // Лог
+                     if (this.isResultDisplayed) {
+                         this.currentExpression = number;
+                         this.isResultDisplayed = false;
+                     } else {
+                         if (number === '0' && this.currentExpression.match(/(^|[\s(*+\-/**])0$/)) return; // Виправлено регулярку степеня
+                         if (this.currentExpression.match(/[)eπ]$/i)) { this.currentExpression += '*'; }
+                         // Якщо поточний вираз '0', замінюємо його
+                         if(this.currentExpression === '0') this.currentExpression = number;
+                         else this.currentExpression += number;
+                     }
+                }
+                appendDecimal() {
+                     console.log(`appendDecimal`); // Лог
+                    if (this.isResultDisplayed) { this.currentExpression = '0.'; this.isResultDisplayed = false; return; }
+                     const match = this.currentExpression.match(/[\d.]+$/);
+                     if (match && match[0].includes('.')) return;
+                     if (!this.currentExpression.match(/[\d]$/)) {
+                         if (this.currentExpression.match(/[eπ)]$/i)) { this.currentExpression += '*0.'; }
+                         else { this.currentExpression += '0.'; }
+                     } else { this.currentExpression += '.'; }
+                }
+                appendOperator(operator) {
+                    console.log(`appendOperator: ${operator}`); // Лог
+                    if (this.currentExpression.toString().startsWith('Error:') || this.currentExpression.toString().startsWith('Помилка:')) return;
+                     this.isResultDisplayed = false;
+                     // Перевіряємо, чи не закінчується вже оператором (з пробілами або без) або відкриваючою дужкою
+                     if (this.currentExpression.match(/([+\-*/]\s?|[(])$/)) {
+                         // Дозволяємо тільки унарний мінус після дужки або іншого оператора
+                         if (operator === '-' && !this.currentExpression.endsWith('- ')) {
+                             this.currentExpression += '-'; // Додаємо як частину числа
+                         }
+                         // Інакше нічого не робимо або замінюємо (якщо треба)
+                         // Наприклад, можна замінити останній оператор
+                         else if (this.currentExpression.match(/[+\-*/]\s?$/)) {
+                              this.currentExpression = this.currentExpression.replace(/[+\-*/]\s?$/, operator + ' ');
+                         }
+                         return; // Не додавати оператор, якщо не можна
+                     }
+                     // Додаємо оператор, якщо вираз не порожній і не просто '-'
+                     else if (this.currentExpression !== '' && this.currentExpression !== '0' && this.currentExpression !== '-') {
+                          this.currentExpression += ' ' + operator + ' ';
+                     }
+                     // Дозволяємо почати з унарного мінуса
+                     else if (operator === '-' && (this.currentExpression === '0' || this.currentExpression === '')) {
+                          this.currentExpression = '-';
+                     }
+                }
+                 appendPowerOperator() {
+                    console.log(`appendPowerOperator`); // Лог
+                     if (this.currentExpression.toString().startsWith('Error:') || this.currentExpression.toString().startsWith('Помилка:') || this.currentExpression.match(/[+\-*/(.\s]$/) || this.currentExpression === '' || this.currentExpression === '0' || this.currentExpression === '-') return;
+                     this.isResultDisplayed = false;
+                     this.currentExpression += '**';
                  }
-                  else {
-                     // Показуємо поточний вираз
-                     this.currentOperandTextElement.innerText = this.currentExpression
-                         .replace(/Math\.PI/g, 'π') // Показуємо символи
-                         .replace(/Math\.E/g, 'e')
-                         .replace(/\*\*/g, '^') // Показуємо степінь як ^
-                         .replace(/window\.factorial\(/g, 'fact('); // Скорочення
-                      // Можна додати показ попереднього результату зверху, якщо він є
-                      if (this.previousResult && !this.previousResult.startsWith('Error:')) {
-                         this.previousOperandTextElement.innerText = `Ans = ${this.formatNumber(this.previousResult)}`;
-                      } else {
+                appendParenthesis(paren) {
+                    console.log(`appendParenthesis: ${paren}`); // Лог
+                    if (this.isResultDisplayed && paren === '(') { this.currentExpression = '('; this.isResultDisplayed = false; this.openParentheses++; return; }
+                     if (this.isResultDisplayed) this.isResultDisplayed = false; // Починаємо новий вираз
+                     else if (this.currentExpression === '0') this.currentExpression = ''; // Очищаємо '0' перед додаванням
+
+                     if (paren === '(') {
+                         if (this.currentExpression.match(/[\d.)eπ]$/i)) { this.currentExpression += '*('; }
+                         else { this.currentExpression += '('; }
+                         this.openParentheses++;
+                     } else if (paren === ')') {
+                         if (this.openParentheses > 0 && !this.currentExpression.match(/[+\-*/(.\s]$/)) {
+                             this.currentExpression += ')';
+                             this.openParentheses--;
+                         }
+                     }
+                }
+                appendFunction(func) {
+                    console.log(`appendFunction: ${func}`); // Лог
+                     if (this.isResultDisplayed) { this.currentExpression = func; this.isResultDisplayed = false; }
+                     else if (this.currentExpression === '0') { this.currentExpression = func; } // Замінити 0
+                     else {
+                         if (this.currentExpression.match(/[\d.)eπ]$/i)) { this.currentExpression += '*' + func; }
+                         else { this.currentExpression += func; }
+                     }
+                     if (!func.startsWith('factorial')) { this.openParentheses++; }
+                     this.isResultDisplayed = false; // Завжди знімаємо флаг результату
+                }
+                appendConstant(constSymbol) {
+                    console.log(`appendConstant: ${constSymbol}`); // Лог
+                     const constValue = constSymbol === 'PI' ? 'π' : 'e';
+                     if (this.isResultDisplayed) { this.currentExpression = constValue; this.isResultDisplayed = false; }
+                      else if (this.currentExpression === '0') { this.currentExpression = constValue; } // Замінити 0
+                     else {
+                         if (this.currentExpression.match(/[\d.)eπ]$/i)) { this.currentExpression += '*' + constValue; }
+                         else { this.currentExpression += constValue; }
+                     }
+                     this.isResultDisplayed = false; // Завжди знімаємо флаг результату
+                }
+
+                // --- Видалення ---
+                deleteLast() {
+                     console.log(`deleteLast`); // Лог
+                     if (this.isResultDisplayed) return;
+                     if (this.currentExpression === '0') return; // Нічого видаляти
+
+                     let expr = this.currentExpression;
+                     let deleted = false;
+
+                     // Видалення функцій, операторів з пробілами, степеня
+                     const patternsToRemove = [
+                         /(sin|cos|tan|log10|log|sqrt|factorial)\($/i, // Функції
+                         /\s[+\-*/]\s$/,                             // Оператори з пробілами
+                         /\*\*$/                                        // Степінь
+                     ];
+
+                     for (const pattern of patternsToRemove) {
+                         const match = expr.match(pattern);
+                         if (match) {
+                             expr = expr.slice(0, -match[0].length);
+                             if (pattern.source.includes('(') && !pattern.source.includes('factorial')) {
+                                 this.openParentheses--;
+                             }
+                             deleted = true;
+                             break;
+                         }
+                     }
+
+                     // Видалення дужок, констант, символів
+                     if (!deleted) {
+                         const lastChar = expr.slice(-1);
+                         expr = expr.slice(0, -1);
+                         if (lastChar === '(') this.openParentheses--;
+                         else if (lastChar === ')') this.openParentheses++;
+                     }
+
+                     // Якщо рядок став порожнім або тільки "-", ставимо '0'
+                     this.currentExpression = (expr === '' || expr === '-') ? '0' : expr;
+
+                     // Якщо видалили все до '0', вважаємо це початковим станом
+                     if (this.currentExpression === '0') {
+                         this.isResultDisplayed = true; // Щоб наступне число перезаписало 0
+                     }
+
+                     this.updateDisplay(); // Оновлюємо одразу
+                }
+
+
+                // --- Інші Функції ---
+                negate() {
+                    console.warn("Negate function still needs proper implementation.");
+                    // Базова спроба: якщо показується результат, міняємо його знак
+                     if (this.isResultDisplayed && this.previousResult && !this.previousResult.startsWith('Помилка:')) {
+                         this.currentExpression = (-parseFloat(this.previousResult)).toString();
+                         this.previousResult = this.currentExpression; // Оновлюємо і попередній результат
+                     }
+                     // Інакше - логіка зміни знаку останнього числа (складно)
+                }
+                toggleAngleMode() { this.isRadians = !this.isRadians; this.updateDisplay(); }
+
+                // --- Пам'ять ---
+                handleMemory(operation) {
+                     console.log(`handleMemory: ${operation}`); // Лог
+                    let currentValue = NaN;
+                     if (this.isResultDisplayed && this.previousResult && !this.previousResult.startsWith('Помилка:')) {
+                         currentValue = parseFloat(this.previousResult);
+                     } else {
+                         try { currentValue = this.evaluateExpression(this.currentExpression); }
+                         catch { currentValue = NaN; }
+                     }
+                     // ... (решта логіки M+, M-, MC, MR, MS без змін) ...
+                     switch(operation) {
+                         case 'MC': this.memoryValue = 0; break;
+                         case 'MR':
+                              if (this.isResultDisplayed || this.currentExpression === '0') {
+                                  this.currentExpression = this.memoryValue.toString();
+                                  this.isResultDisplayed = false;
+                              } else {
+                                  if (this.currentExpression.match(/[\d.)eπ]$/i)) { this.currentExpression += '*' + this.memoryValue.toString(); }
+                                  else { this.currentExpression += this.memoryValue.toString(); }
+                              } break;
+                         case 'MS': if (!isNaN(currentValue)) { this.memoryValue = currentValue; } else { this.previousOperandTextElement.innerText = "Неможливо зберегти"; } break;
+                         case 'M+': if (!isNaN(currentValue)) { this.memoryValue += currentValue; } else { this.previousOperandTextElement.innerText = "Неможливо додати"; } break;
+                         case 'M-': if (!isNaN(currentValue)) { this.memoryValue -= currentValue; } else { this.previousOperandTextElement.innerText = "Неможливо відняти"; } break;
+                     }
+                     this.updateDisplay();
+                }
+
+                 // --- Обчислення ---
+                 evaluateExpression(expression) {
+                     console.log(`Evaluating: "${expression}"`); // Лог
+                     let evalExpression = expression.trim();
+                     // Автоматичне закриття дужок (може бути небезпечним, краще вимагати від користувача)
+                     // if (this.openParentheses > 0) { evalExpression += ')'.repeat(this.openParentheses); }
+                     // Перевірка на незакриті дужки перед обчисленням
+                     if(this.openParentheses !== 0) {
+                        throw new Error("Незакриті дужки");
+                     }
+                     // Перевірка на оператор в кінці виразу
+                      if (evalExpression.match(/[+\-*/.]\s?$/) && !evalExpression.endsWith(')')) {
+                         throw new Error("Вираз не завершено");
+                      }
+
+                     this.openParentheses = 0; // Скидаємо лічильник
+
+                     evalExpression = evalExpression
+                         .replace(/π/g, 'Math.PI').replace(/e/g, 'Math.E')
+                         .replace(/log10\(/g, 'Math.log10(').replace(/log\(/g, 'Math.log(')
+                         .replace(/sqrt\(/g, 'Math.sqrt(').replace(/sin\(/g, 'Math.sin(')
+                         .replace(/cos\(/g, 'Math.cos(').replace(/tan\(/g, 'Math.tan(')
+                         .replace(/factorial\(/g, 'window.factorial(')
+                         .replace(/\^/g, '**').replace(/\s/g, ''); // Видаляємо пробіли
+
+                     console.log(`Formatted for eval: "${evalExpression}"`); // Лог
+
+                     // ** ПОПЕРЕДЖЕННЯ ПРО БЕЗПЕКУ new Function() ЗАЛИШАЄТЬСЯ **
+                     const calculate = new Function('"use strict"; return ' + evalExpression); // Додаємо 'use strict'
+                     let result = calculate();
+
+                     if (!isFinite(result)) {
+                         if (isNaN(result)) throw new Error("Невірний вираз");
+                         else throw new Error("Ділення на нуль / Переповнення");
+                     }
+                     return parseFloat(result.toPrecision(15));
+                 }
+                compute() {
+                    console.log(`compute called`); // Лог
+                    if (this.currentExpression.toString().startsWith('Error:') || this.currentExpression.toString().startsWith('Помилка:')) return;
+                    // Якщо показується результат, нічого не робимо (повторне натискання =)
+                    if (this.isResultDisplayed && this.previousResult !== '') return;
+
+                    try {
+                        const result = this.evaluateExpression(this.currentExpression);
+                        this.previousResult = result.toString();
+                        this.currentExpression = this.previousResult;
+                        this.isResultDisplayed = true;
+                        this.previousOperandTextElement.innerText = '';
+                        console.log(`Result: ${result}`); // Лог
+                    } catch (error) {
+                        console.error(`Evaluation error: ${error.message}`); // Лог помилки
+                        this.previousResult = `Помилка: ${error.message}`;
+                        // Не скидаємо currentExpression на 0, щоб користувач бачив помилку
+                        this.currentExpression = this.previousResult; // Показуємо помилку в головному полі
+                        this.isResultDisplayed = true;
+                        this.previousOperandTextElement.innerText = ''; // Очищаємо верхній рядок
+                    }
+                     this.openParentheses = 0; // Скидаємо дужки
+                }
+
+                // --- Оновлення Дисплея ---
+                updateDisplay() {
+                     console.log('updateDisplay called'); // Лог
+                     this.memoryIndicator.innerText = this.memoryValue !== 0 ? 'M' : '';
+                     this.angleIndicator.innerText = this.isRadians ? 'RAD' : 'DEG';
+                     document.querySelectorAll('button[data-action="angle-mode"]').forEach(btn => {
+                          btn.classList.remove('active-mode');
+                          if ((this.isRadians && btn.dataset.value === 'RAD') || (!this.isRadians && btn.dataset.value === 'DEG')) { btn.classList.add('active-mode'); }
+                     });
+
+                     // Показ помилки
+                     if (this.currentExpression.toString().startsWith('Помилка:')) {
+                         this.currentOperandTextElement.innerText = this.currentExpression;
                          this.previousOperandTextElement.innerText = '';
-                      }
-                 }
-                 this.adjustFontSize(); // Підгонка розміру шрифту
+                     }
+                     // Показ результату
+                     else if (this.isResultDisplayed) {
+                          this.currentOperandTextElement.innerText = this.formatNumber(this.currentExpression);
+                          this.previousOperandTextElement.innerText = '';
+                     }
+                     // Показ виразу, що вводиться
+                      else {
+                         this.currentOperandTextElement.innerText = this.currentExpression
+                             .replace(/Math\.PI/g, 'π').replace(/Math\.E/g, 'e')
+                             .replace(/\*\*/g, '^').replace(/window\.factorial\(/g, 'fact(');
+                          if (this.previousResult && !this.previousResult.startsWith('Помилка:')) {
+                             this.previousOperandTextElement.innerText = `Ans = ${this.formatNumber(this.previousResult)}`;
+                          } else {
+                             this.previousOperandTextElement.innerText = '';
+                          }
+                     }
+                     this.adjustFontSize();
+                }
+                formatNumber(numberString) {
+                    // ... (код без змін) ...
+                     if (typeof numberString !== 'string' || numberString.startsWith('Помилка:')) return numberString;
+                    try {
+                        // Перевіряємо наявність експоненти
+                         if (numberString.toLowerCase().includes('e')) {
+                             return numberString; // Не форматуємо експоненційний запис
+                         }
+                        const number = parseFloat(numberString.replace(',', '.')); // Замінюємо кому на крапку для parseFloat
+                        if (isNaN(number)) return numberString;
+                        return number.toLocaleString('uk-UA', { maximumFractionDigits: 10 }).replace('.', ',');
+                    } catch { return numberString; }
+                }
+                 adjustFontSize() {
+                    const element = this.currentOperandTextElement;
+                    if (!element) return; // Перевірка на існування елемента
+                    const container = element.parentElement;
+                    if (!container) return;
+
+                    let fontSize = parseFloat(window.getComputedStyle(element).fontSize);
+                    const baseFontSizePx = 1.8 * parseFloat(window.getComputedStyle(document.body).fontSize || 16); // 1.8em в пікселях
+
+                    element.style.fontSize = (baseFontSizePx / 16) + 'em'; // Reset to base size in em
+
+                    // Використовуємо requestAnimationFrame для вимірювання після рендерингу
+                    requestAnimationFrame(() => {
+                        const scrollWidth = element.scrollWidth;
+                        const clientWidth = element.clientWidth;
+
+                        if (scrollWidth > clientWidth) {
+                            const ratio = clientWidth / scrollWidth;
+                            let newFontSizePx = Math.max(1.0 * 16, baseFontSizePx * ratio * 0.95); // * 0.95 запас
+                            element.style.fontSize = (newFontSizePx / 16) + 'em';
+                        } else {
+                            element.style.fontSize = (baseFontSizePx / 16) + 'em'; // Повертаємо базовий розмір
+                        }
+                    });
+                }
+
+                // --- Голосовий Ввід та Обробка ---
+                setupVoiceRecognition() {
+                    if (!this.recognition) {
+                        console.error("Web Speech API не підтримується.");
+                        this.voiceStatusIndicator.innerText = "Голос не підтримується";
+                        return;
+                    }
+                    this.recognition.lang = 'uk-UA';
+                    this.recognition.interimResults = false;
+                    this.recognition.maxAlternatives = 1;
+
+                    this.recognition.onstart = () => { /* ... (без змін) ... */
+                         this.isListening = true; this.voiceStatusIndicator.innerText = "Слухаю...";
+                         document.getElementById('voice-input-btn')?.classList.add('listening'); console.log("Розпізнавання почалося");
+                    };
+                    this.recognition.onresult = (event) => { /* ... (без змін) ... */
+                        const transcript = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
+                        console.log('Розпізнано:', transcript); this.voiceStatusIndicator.innerText = "Обробка...";
+                        this.processVoiceCommand(transcript);
+                    };
+                    this.recognition.onerror = (event) => { /* ... (без змін) ... */
+                         this.isListening = false; let errorMessage = "Помилка розпізнавання";
+                         if (event.error === 'no-speech') errorMessage = "Нічого не почув";
+                         else if (event.error === 'audio-capture') errorMessage = "Проблема з мікрофоном";
+                         else if (event.error === 'not-allowed') errorMessage = "Дозвіл відхилено";
+                         else errorMessage += `: ${event.error}`;
+                         this.voiceStatusIndicator.innerText = errorMessage; console.error('Помилка розпізнавання:', event.error);
+                         document.getElementById('voice-input-btn')?.classList.remove('listening');
+                    };
+                    this.recognition.onend = () => { /* ... (без змін) ... */
+                         this.isListening = false; console.log("Розпізнавання закінчилося");
+                         document.getElementById('voice-input-btn')?.classList.remove('listening');
+                         this.updateDisplay(); // Оновлюємо дисплей ПІСЛЯ обробки команди
+                    };
+                }
+                toggleListening() { /* ... (без змін) ... */
+                     if (!this.recognition) return; if (this.isListening) { this.recognition.stop(); }
+                     else { try { this.recognition.start(); } catch (e) { console.error("Не вдалося почати розпізнавання:", e); this.voiceStatusIndicator.innerText = "Помилка старту"; this.isListening = false; document.getElementById('voice-input-btn')?.classList.remove('listening'); } }
+                }
+                processVoiceCommand(command) {
+                    console.log(`Обробка команди: "${command}"`);
+                     let processed = command;
+                     const replacements = { /* ... (словник без змін) ... */
+                        'нуль': '0', 'один': '1', 'два': '2', 'три': '3', 'чотири': '4',
+                        'п\'ять': '5', "п'ятірка": '5', 'шість': '6', 'сім': '7', 'вісім': '8', 'дев\'ять': '9',
+                        'десять': '10', 'одинадцять': '11', 'дванадцять': '12',
+                        'кома': '.', 'крапка': '.',
+                        'плюс': '+', 'додати': '+', 'мінус': '-', 'відняти': '-',
+                        'помножити': '*', 'на': '*', 'поділити': '/', 'розділити': '/',
+                        'степінь': '**', 'в степені': '**',
+                        'корінь квадратний з': 'sqrt(', 'корінь з': 'sqrt(', 'корінь': 'sqrt(',
+                        'синус': 'sin(', 'косинус': 'cos(', 'тангенс': 'tan(',
+                        'логарифм натуральний': 'log(', 'логарифм десятковий': 'log10(', 'логарифм': 'log10(',
+                        'факторіал': 'factorial(', 'пі': 'π', 'число пі': 'π', 'число е': 'e',
+                        'дорівнює': '=', 'результат': '=', 'відповідь': '=',
+                        'очистити все': 'AC', 'стерти все': 'AC', 'скинути': 'AC',
+                        'очистити': 'CE', 'стерти': 'CE',
+                        'видалити': 'DEL', 'назад': 'DEL'
+                     };
+                     for (const [word, replacement] of Object.entries(replacements)) {
+                         const regex = new RegExp(`\\b${word}\\b`, 'gi'); processed = processed.replace(regex, replacement);
+                     }
+                     processed = processed.replace(/\b(з|від|число|до)\b/gi, '').replace(/\s+/g, ' ').trim();
+                     console.log(`Після обробки: "${processed}"`);
+
+                     if (processed === '=') { this.compute(); }
+                     else if (processed === 'AC') { this.clearAll(); }
+                     else if (processed === 'CE') { this.clearEntry(); }
+                     else if (processed === 'DEL') { this.deleteLast(); }
+                     else {
+                         // Замість ітерації символів, просто встановлюємо весь розпізнаний рядок
+                         // (це може бути не ідеально, але простіше)
+                         if (this.isResultDisplayed || this.currentExpression === '0') {
+                             this.currentExpression = processed;
+                         } else {
+                              // Можна спробувати додати до поточного виразу, якщо це логічно
+                              // Наприклад, якщо поточний вираз закінчується оператором
+                              if (this.currentExpression.match(/[+\-*/]\s?$/)) {
+                                  this.currentExpression += processed;
+                              } else {
+                                   // Або просто замінюємо - це безпечніше
+                                  this.currentExpression = processed;
+                              }
+                         }
+                         this.isResultDisplayed = false;
+                         this.openParentheses = (processed.match(/\(/g) || []).length - (processed.match(/\)/g) || []).length;
+                         // Не викликаємо updateDisplay тут, бо він викликається в onend
+                     }
+                }
+
+            } // --- Кінець класу ScientificCalculator ---
+
+            // --- Ініціалізація та Запуск ---
+            const previousOperandTextElement = document.getElementById('previous-operand');
+            const currentOperandTextElement = document.getElementById('current-operand');
+            const memoryIndicator = document.getElementById('memory-indicator');
+            const angleIndicator = document.getElementById('angle-indicator');
+            const voiceStatusIndicator = document.getElementById('voice-status');
+            const buttons = document.querySelectorAll('.buttons button'); // Вибираємо кнопки тільки всередині .buttons
+            const voiceInputButton = document.getElementById('voice-input-btn');
+
+            // Перевірка наявності елементів перед створенням калькулятора
+            if (!previousOperandTextElement || !currentOperandTextElement || !memoryIndicator || !angleIndicator || !voiceStatusIndicator) {
+                console.error("Помилка: Не знайдено один або більше елементів дисплея/індикатора!");
+                return;
             }
 
-            formatNumber(numberString) {
-                 // Проста перевірка на помилку
-                 if (typeof numberString !== 'string' || numberString.startsWith('Error:')) return numberString;
-                try {
-                    const number = parseFloat(numberString);
-                    if (isNaN(number)) return numberString; // Якщо не число, повертаємо як є
+            const calculator = new ScientificCalculator(
+                previousOperandTextElement,
+                currentOperandTextElement,
+                memoryIndicator,
+                angleIndicator,
+                voiceStatusIndicator
+            );
 
-                    // Використовуємо toLocaleString для форматування
-                    // Замінюємо крапку на кому для українського формату
-                    return number.toLocaleString('uk-UA', { maximumFractionDigits: 10 }).replace('.', ',');
-                } catch {
-                    return numberString; // Повертаємо рядок, якщо сталася помилка форматування
-                }
-            }
+            // Додавання обробників подій для кнопок
+            buttons.forEach(button => {
+                if (button.id === 'voice-input-btn') return; // Пропускаємо кнопку голосу
 
-            adjustFontSize() {
-                const element = this.currentOperandTextElement;
-                const container = element.parentElement;
-                let fontSize = parseFloat(window.getComputedStyle(element).fontSize);
-                const baseFontSize = 1.8 * 16; // 1.8em в пікселях (приблизно)
-                element.style.fontSize = (baseFontSize / 16) + 'em'; // Reset to base
+                button.addEventListener('click', () => {
+                    console.log(`Button clicked: action=${button.dataset.action}, value=${button.dataset.value}`); // Лог натискання
+                    const action = button.dataset.action;
+                    const value = button.dataset.value;
 
-                 // Проста перевірка переповнення по ширині
-                 // Вимірювання scrollWidth може бути неточним для inline елементів або з word-break
-                 // Цей метод потребує покращення для точності
-                if (element.scrollWidth > container.clientWidth - 10) { // -10px запас
-                    const ratio = (container.clientWidth - 10) / element.scrollWidth;
-                    fontSize = Math.max(1.0 * 16, baseFontSize * ratio); // Не менше 1.0em
-                    element.style.fontSize = (fontSize / 16) + 'em';
-                }
-            }
-
-        }
-
-        // Ініціалізація
-        const previousOperandTextElement = document.getElementById('previous-operand');
-        const currentOperandTextElement = document.getElementById('current-operand');
-        const memoryIndicator = document.getElementById('memory-indicator');
-        const angleIndicator = document.getElementById('angle-indicator');
-        const buttons = document.querySelectorAll('button');
-
-        const calculator = new ScientificCalculator(
-            previousOperandTextElement,
-            currentOperandTextElement,
-            memoryIndicator,
-            angleIndicator
-        );
-
-        // Додавання обробників подій
-        buttons.forEach(button => {
-            button.addEventListener('click', () => {
-                const action = button.dataset.action;
-                const value = button.dataset.value;
-
-                switch (action) {
-                    case 'number': calculator.appendNumber(value); break;
-                    case 'decimal': calculator.appendDecimal(); break;
-                    case 'operator': calculator.appendOperator(value); break;
-                    case 'power': calculator.appendPowerOperator(); break;
-                    case 'parenthesis': calculator.appendParenthesis(value); break;
-                    case 'trig':
-                    case 'log':
-                    case 'function': // sqrt
-                         calculator.appendFunction(value);
-                         break;
-                    case 'factorial': calculator.appendFunction(value); break;
-                    case 'constant': calculator.appendConstant(value); break;
-                    case 'equals': calculator.compute(); break;
-                    case 'clear':
-                         if (value === 'AC') calculator.clearAll();
-                         else if (value === 'CE') calculator.clearEntry();
-                         break;
-                    case 'delete': calculator.deleteLast(); break;
-                    case 'negate': calculator.negate(); break; // Поки що не працює
-                    case 'angle-mode': calculator.toggleAngleMode(); break; // Поки тільки UI
-                    case 'memory': calculator.handleMemory(value); break;
-                }
-                // Оновлюємо дисплей тільки якщо це не delete (він оновлює сам)
-                if (action !== 'delete') {
-                     calculator.updateDisplay();
-                }
+                    try { // Обгортаємо виклик методу в try...catch
+                        switch (action) {
+                            case 'number': calculator.appendNumber(value); break;
+                            case 'decimal': calculator.appendDecimal(); break;
+                            case 'operator': calculator.appendOperator(value); break;
+                            case 'power': calculator.appendPowerOperator(); break;
+                            case 'parenthesis': calculator.appendParenthesis(value); break;
+                            case 'trig': case 'log': case 'function': case 'factorial':
+                                calculator.appendFunction(value); break;
+                            case 'constant': calculator.appendConstant(value); break;
+                            case 'equals': calculator.compute(); break;
+                            case 'clear':
+                                if (value === 'AC') calculator.clearAll();
+                                else if (value === 'CE') calculator.clearEntry();
+                                break;
+                            case 'delete': calculator.deleteLast(); break;
+                            case 'negate': calculator.negate(); break;
+                            case 'angle-mode': calculator.toggleAngleMode(); break;
+                            case 'memory': calculator.handleMemory(value); break;
+                            default: console.warn(`Невідома дія: ${action}`);
+                        }
+                        // Оновлюємо дисплей після кожної дії, крім delete (він оновлює сам)
+                        if (action !== 'delete') {
+                            calculator.updateDisplay();
+                        }
+                    } catch (error) {
+                        console.error("Помилка під час обробки натискання кнопки:", error);
+                        // Можна показати помилку користувачу
+                        calculator.currentExpression = "Внутрішня помилка";
+                        calculator.isResultDisplayed = true;
+                        calculator.updateDisplay();
+                    }
+                });
             });
-        });
 
-        // --- Обробка клавіатури (розширена) ---
-         document.addEventListener('keydown', (event) => {
-             const key = event.key;
-             let buttonToClick = null;
-             event.preventDefault(); // Запобігаємо більшості стандартних дій клавіш
+            // Обробник для кнопки голосового вводу
+            if (voiceInputButton) {
+                voiceInputButton.addEventListener('click', () => {
+                     console.log('Voice button clicked'); // Лог
+                    calculator.toggleListening();
+                });
+            } else {
+                console.error("Кнопка голосового вводу (#voice-input-btn) не знайдена!");
+            }
 
-             if (key >= '0' && key <= '9') {
-                 buttonToClick = document.querySelector(`button[data-action="number"][data-value="${key}"]`);
-             } else if (key === '.' || key === ',') {
-                 buttonToClick = document.querySelector('button[data-action="decimal"]');
-             } else if (key === '+' || key === '-' || key === '*' || key === '/') {
-                 buttonToClick = document.querySelector(`button[data-action="operator"][data-value="${key}"]`);
-             } else if (key === '^') {
-                  buttonToClick = document.querySelector('button[data-action="power"]');
-             } else if (key === '(') {
-                  buttonToClick = document.querySelector('button[data-action="parenthesis"][data-value="("]');
-             } else if (key === ')') {
-                  buttonToClick = document.querySelector('button[data-action="parenthesis"][data-value=")"]');
-             } else if (key === '!') {
-                 buttonToClick = document.querySelector('button[data-action="factorial"]');
-             } else if (key.toLowerCase() === 'p') { // Pi
-                  buttonToClick = document.querySelector('button[data-action="constant"][data-value="PI"]');
-             } else if (key.toLowerCase() === 'e') { // Euler's number
-                  buttonToClick = document.querySelector('button[data-action="constant"][data-value="E"]');
-             } else if (key === 'Enter' || key === '=') {
-                 buttonToClick = document.querySelector('button[data-action="equals"]');
-             } else if (key === 'Backspace') {
-                 buttonToClick = document.querySelector('button[data-action="delete"]');
-             } else if (key === 'Escape') {
-                 buttonToClick = document.querySelector('button[data-action="clear"][data-value="AC"]');
-             } else if (key === 'Delete') {
-                 buttonToClick = document.querySelector('button[data-action="clear"][data-value="CE"]');
-             }
-              // Додайте інші клавіші за потреби (sin, cos, log...)
+            // --- Обробка клавіатури ---
+             document.addEventListener('keydown', (event) => {
+                 const key = event.key;
+                 let buttonToClick = null;
+                 // ... (решта коду обробки клавіатури без змін) ...
+                  if (key >= '0' && key <= '9') buttonToClick = document.querySelector(`button[data-action="number"][data-value="${key}"]`);
+                  else if (key === '.' || key === ',') buttonToClick = document.querySelector('button[data-action="decimal"]');
+                  else if (key === '+' || key === '-' || key === '*' || key === '/') buttonToClick = document.querySelector(`button[data-action="operator"][data-value="${key}"]`);
+                  else if (key === '^') buttonToClick = document.querySelector('button[data-action="power"]');
+                  else if (key === '(') buttonToClick = document.querySelector('button[data-action="parenthesis"][data-value="("]`);
+                  else if (key === ')') buttonToClick = document.querySelector('button[data-action="parenthesis"][data-value=")"]');
+                  else if (key === '!') buttonToClick = document.querySelector('button[data-action="factorial"]');
+                  else if (key.toLowerCase() === 'p') buttonToClick = document.querySelector('button[data-action="constant"][data-value="PI"]');
+                  else if (key.toLowerCase() === 'e') buttonToClick = document.querySelector('button[data-action="constant"][data-value="E"]');
+                  else if (key === 'Enter' || key === '=') buttonToClick = document.querySelector('button[data-action="equals"]');
+                  else if (key === 'Backspace') buttonToClick = document.querySelector('button[data-action="delete"]');
+                  else if (key === 'Escape') buttonToClick = document.querySelector('button[data-action="clear"][data-value="AC"]');
+                  else if (key === 'Delete') buttonToClick = document.querySelector('button[data-action="clear"][data-value="CE"]');
 
-             if (buttonToClick) {
-                 buttonToClick.click(); // Симулюємо клік
-                 // Візуальний ефект натискання
-                 buttonToClick.classList.add('active-key');
-                 setTimeout(() => buttonToClick.classList.remove('active-key'), 100);
-             }
-         });
-          // Додатковий CSS для візуального ефекту натискання клавіші
-          const keyStyle = document.createElement('style');
-          keyStyle.innerHTML = `
-              button.active-key {
-                  background-color: #ccc !important;
-                  box-shadow: inset 0 2px 4px rgba(0,0,0,0.2) !important;
-              }
-          `;
-          document.head.appendChild(keyStyle);
+                 if (buttonToClick) {
+                     event.preventDefault();
+                     buttonToClick.click();
+                     buttonToClick.classList.add('active-key');
+                     setTimeout(() => buttonToClick.classList.remove('active-key'), 100);
+                 }
+             });
+              const keyStyle = document.createElement('style');
+              keyStyle.innerHTML = `button.active-key { background-color: #ccc !important; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2) !important; }`;
+              document.head.appendChild(keyStyle);
 
-        // JavaScript код закінчується тут
+        }); // Кінець обгортки DOMContentLoaded
     </script>
 </body>
 </html>
